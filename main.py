@@ -89,7 +89,7 @@ def scrape_data(driver, max_pages, url):
     return data
 
 
-def save_to_csv(data, filename="ibm_reviews.csv"):
+def save_to_csv(data, filename="reviews.csv"):
     df = pd.DataFrame(data)
     df.to_csv(filename, index=False)
     return f"Data has been written to {filename}", filename
@@ -104,12 +104,14 @@ def access_and_interact(url, max_pages):
         driver.quit()
 
 
+flagging_dir = "/home/ubuntu/flagged"  # Specify the directory for flagging
 interface = gr.Interface(
     fn=access_and_interact,
     inputs=["text", "number"],
     outputs=["text", "file"],
     title="Web Scraper Interface",
     description="Enter the URL of the page and the number of pages to scrape.",
+    flagging_dir=flagging_dir,  # Specify the flagging directory
 )
 
 interface.launch()
