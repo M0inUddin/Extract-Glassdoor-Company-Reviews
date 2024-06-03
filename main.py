@@ -175,7 +175,7 @@ interface = gr.Interface(
     inputs=["text", "number"],
     outputs=["text", "file"],
     title="Web Scraper Interface",
-    description="Enter the URL of the page, number of pages to scrape, and your Glassdoor email and password.",
+    description="Please Enter the URL of reviews page from Glassdoor.",
     flagging_dir=flagging_dir,  # Specify the flagging directory
 )
 
