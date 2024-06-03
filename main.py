@@ -4,6 +4,7 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.keys import Keys
 import pandas as pd
 import time
 
@@ -12,6 +13,7 @@ def setup_driver():
     options = Options()
     options.add_argument("--start-maximized")
     options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--disable-blink-features=AutomationControlled")
     options.add_experimental_option("excludeSwitches", ["enable-automation"])
     options.add_experimental_option("useAutomationExtension", False)
@@ -20,20 +22,49 @@ def setup_driver():
     driver = webdriver.Chrome(service=service, options=options)
     return driver
 
+
+def login_to_glassdoor(driver):
+    driver.get("https://www.glassdoor.com")
+    time.sleep(5)  # Wait for the page to load
+
+    # Find and fill the email field
+    email_field = driver.find_element(By.CSS_SELECTOR, "input#inlineUserEmail")
+    email_field.send_keys("guttuhopuddeu-8645@yopmail.com")
+
+    # Find and click the continue button
+    continue_button = driver.find_element(
+        By.CSS_SELECTOR, "button[data-test='email-form-button']"
+    )
+    continue_button.click()
+
+    time.sleep(5)  # Wait for the password field to appear
+
+    # Find and fill the password field
+    password_field = driver.find_element(By.CSS_SELECTOR, "input#inlineUserPassword")
+    password_field.send_keys("Asd123123")
+
+    # Find and click the sign-in button
+    sign_in_button = driver.find_element(
+        By.CSS_SELECTOR, "button[data-role-variant='primary']"
+    )
+    sign_in_button.click()
+
+    time.sleep(10)  # Wait for the login process to complete
+
+
 def dismiss_overlays(driver):
     try:
-        consent_button = driver.find_element(By.CSS_SELECTOR, "button#onetrust-accept-btn-handler")
+        consent_button = driver.find_element(
+            By.CSS_SELECTOR, "button#onetrust-accept-btn-handler"
+        )
         if consent_button.is_displayed():
             consent_button.click()
             time.sleep(2)  # Wait for the overlay to disappear
     except Exception as e:
         pass
 
-def scrape_data(driver, max_pages, url):
-    # First open a tab to glassdoor.com
-    driver.get("https://www.glassdoor.com")
-    time.sleep(5)  # Wait for the page to load
 
+def scrape_data(driver, max_pages, url):
     # Now open the user-provided URL in a new tab
     driver.execute_script(f"window.open('{url}', '_blank');")
     driver.switch_to.window(driver.window_handles[1])
@@ -44,10 +75,7 @@ def scrape_data(driver, max_pages, url):
     data = []
     page_count = 0
     while page_count < max_pages:
-        time.sleep(15)
-
-        dismiss_overlays(driver)  # Dismiss any overlays if present
-
+        time.sleep(3)
         reviews = driver.find_elements(
             By.CSS_SELECTOR, "div.review-details_topReview__5NRVX"
         )
@@ -57,35 +85,30 @@ def scrape_data(driver, max_pages, url):
                     By.CSS_SELECTOR, "span.review-details_overallRating__Rxhdr"
                 ).text.strip()
             except Exception as e:
-                print(e)
                 rating = None
             try:
                 date = review.find_element(
                     By.CSS_SELECTOR, "span.timestamp_reviewDate__fBGY6"
                 ).text.strip()
             except Exception as e:
-                print(e)
                 date = None
             try:
                 title = review.find_element(
                     By.CSS_SELECTOR, 'h2[data-test="review-details-title"]'
                 ).text.strip()
             except Exception as e:
-                print(e)
                 title = None
             try:
                 employee_role = review.find_element(
                     By.CSS_SELECTOR, "span.review-details_employee__MeSp3"
                 ).text.strip()
             except Exception as e:
-                print(e)
                 employee_role = None
             try:
                 review_url = review.find_element(
                     By.CSS_SELECTOR, 'a[data-test="review-details-title-link"]'
                 ).get_attribute("href")
             except Exception as e:
-                print(e)
                 review_url = None
 
             data.append(
@@ -99,13 +122,14 @@ def scrape_data(driver, max_pages, url):
             )
 
         try:
-            next_button = driver.find_element(By.CSS_SELECTOR, 'button[data-test="next-page"]')
+            next_button = driver.find_element(
+                By.CSS_SELECTOR, 'button[data-test="next-page"]'
+            )
             driver.execute_script("arguments[0].scrollIntoView();", next_button)
             next_button.click()
             page_count += 1
-            time.sleep(5)
+            time.sleep(5)  # Wait for the next page to load
         except Exception as e:
-            print(e)
             break
 
     return data
@@ -120,6 +144,7 @@ def save_to_csv(data, filename="reviews.csv"):
 def access_and_interact(url, max_pages):
     driver = setup_driver()
     try:
+        login_to_glassdoor(driver)
         data = scrape_data(driver, int(max_pages), url)
         return save_to_csv(data)
     finally:
@@ -132,7 +157,7 @@ interface = gr.Interface(
     inputs=["text", "number"],
     outputs=["text", "file"],
     title="Web Scraper Interface",
-    description="Enter the URL of the page and the number of pages to scrape.",
+    description="Enter the URL of the page, number of pages to scrape, and your Glassdoor email and password.",
     flagging_dir=flagging_dir,  # Specify the flagging directory
 )
 
