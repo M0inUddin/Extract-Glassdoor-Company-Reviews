@@ -50,14 +50,14 @@ def login_to_glassdoor(driver):
     )
     continue_button.click()
 
-    time.sleep(1)  # Wait for the password field to appear
+    time.sleep(10)  # Wait for the password field to appear
 
     close_popups(driver)  # Close any popups if present
 
     # Find and fill the password field
     password_field = driver.find_element(By.CSS_SELECTOR, "input#inlineUserPassword")
     password_field.send_keys("Asd123123")
-
+    time.sleep(120)
     # Find and click the sign-in button
     sign_in_button = driver.find_element(
         By.CSS_SELECTOR, "button[data-role-variant='primary']"
