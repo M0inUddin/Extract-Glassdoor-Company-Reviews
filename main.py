@@ -72,6 +72,7 @@ def scrape_data(driver, max_pages, url):
             if next_button.is_enabled():
                 next_button.click()
                 page_count += 1
+                time.sleep(5)  # Wait for the next page to load
             else:
                 break
         except Exception as e:
@@ -102,4 +103,4 @@ interface = gr.Interface(
     flagging_dir=flagging_dir,  # Specify the flagging directory
 )
 
-interface.launch(server_name="0.0.0.0", server_port=7860)
+interface.launch()
