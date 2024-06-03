@@ -33,7 +33,7 @@ def scrape_data(driver, max_pages, url):
     data = []
     page_count = 0
     while page_count < max_pages:
-        time.sleep(3)
+        time.sleep(15)
         reviews = driver.find_elements(By.CSS_SELECTOR, "div.review-details_topReview__5NRVX")
         for review in reviews:
             try:
@@ -72,7 +72,7 @@ def scrape_data(driver, max_pages, url):
             if next_button.is_enabled():
                 next_button.click()
                 page_count += 1
-                time.sleep(5)  # Wait for the next page to load
+                time.sleep(15)  # Wait for the next page to load
             else:
                 break
         except Exception as e:
