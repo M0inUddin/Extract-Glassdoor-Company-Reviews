@@ -24,7 +24,7 @@ def setup_driver():
 
 def scrape_data(driver, max_pages, url):
     driver.get(url)
-
+    time.sleep(10)
     data = []
     page_count = 0
     while page_count < max_pages:
