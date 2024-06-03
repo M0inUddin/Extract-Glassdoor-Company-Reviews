@@ -20,6 +20,14 @@ def setup_driver():
     driver = webdriver.Chrome(service=service, options=options)
     return driver
 
+def dismiss_overlays(driver):
+    try:
+        consent_button = driver.find_element(By.CSS_SELECTOR, "button#onetrust-accept-btn-handler")
+        if consent_button.is_displayed():
+            consent_button.click()
+            time.sleep(2)  # Wait for the overlay to disappear
+    except Exception as e:
+        pass
 
 def scrape_data(driver, max_pages, url):
     # First open a tab to glassdoor.com
@@ -31,10 +39,15 @@ def scrape_data(driver, max_pages, url):
     driver.switch_to.window(driver.window_handles[1])
     time.sleep(10)  # Wait for the page to load
 
+    dismiss_overlays(driver)  # Dismiss any overlays if present
+
     data = []
     page_count = 0
     while page_count < max_pages:
         time.sleep(15)
+
+        dismiss_overlays(driver)  # Dismiss any overlays if present
+
         reviews = driver.find_elements(
             By.CSS_SELECTOR, "div.review-details_topReview__5NRVX"
         )
@@ -86,15 +99,11 @@ def scrape_data(driver, max_pages, url):
             )
 
         try:
-            next_button = driver.find_element(
-                By.CSS_SELECTOR, 'button[data-test="next-page"]'
-            )
-            if next_button.is_enabled():
-                next_button.click()
-                page_count += 1
-                time.sleep(15)  # Wait for the next page to load
-            else:
-                break
+            next_button = driver.find_element(By.CSS_SELECTOR, 'button[data-test="next-page"]')
+            driver.execute_script("arguments[0].scrollIntoView();", next_button)
+            next_button.click()
+            page_count += 1
+            time.sleep(5)
         except Exception as e:
             print(e)
             break
