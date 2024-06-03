@@ -10,6 +10,7 @@ import time
 
 def setup_driver():
     options = Options()
+    options.add_argument("--user-data-dir=/home/.config/google-chrome")
     options.add_argument("--start-maximized")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
