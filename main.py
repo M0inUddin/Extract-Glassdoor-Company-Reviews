@@ -37,7 +37,7 @@ def login_to_glassdoor(driver):
     )
     continue_button.click()
 
-    time.sleep(5)  # Wait for the password field to appear
+    time.sleep(1)  # Wait for the password field to appear
 
     # Find and fill the password field
     password_field = driver.find_element(By.CSS_SELECTOR, "input#inlineUserPassword")
