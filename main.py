@@ -4,7 +4,6 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.keys import Keys
 import pandas as pd
 import time
 
@@ -23,9 +22,23 @@ def setup_driver():
     return driver
 
 
+def close_popups(driver):
+    try:
+        popup_close_button = driver.find_element(
+            By.CSS_SELECTOR, "button.popup-close-button"
+        )  # Update selector to match actual popup close button
+        if popup_close_button.is_displayed():
+            popup_close_button.click()
+            time.sleep(2)  # Wait for the popup to close
+    except Exception as e:
+        pass
+
+
 def login_to_glassdoor(driver):
     driver.get("https://www.glassdoor.com")
     time.sleep(5)  # Wait for the page to load
+
+    close_popups(driver)  # Close any popups if present
 
     # Find and fill the email field
     email_field = driver.find_element(By.CSS_SELECTOR, "input#inlineUserEmail")
@@ -39,6 +52,8 @@ def login_to_glassdoor(driver):
 
     time.sleep(1)  # Wait for the password field to appear
 
+    close_popups(driver)  # Close any popups if present
+
     # Find and fill the password field
     password_field = driver.find_element(By.CSS_SELECTOR, "input#inlineUserPassword")
     password_field.send_keys("Asd123123")
@@ -50,6 +65,7 @@ def login_to_glassdoor(driver):
     sign_in_button.click()
 
     time.sleep(10)  # Wait for the login process to complete
+    close_popups(driver)  # Close any popups if present
 
 
 def dismiss_overlays(driver):
@@ -71,6 +87,7 @@ def scrape_data(driver, max_pages, url):
     time.sleep(10)  # Wait for the page to load
 
     dismiss_overlays(driver)  # Dismiss any overlays if present
+    close_popups(driver)  # Close any popups if present
 
     data = []
     page_count = 0
@@ -145,6 +162,7 @@ def access_and_interact(url, max_pages):
     driver = setup_driver()
     try:
         login_to_glassdoor(driver)
+        time.sleep(10)  # Wait for the login process to complete
         data = scrape_data(driver, int(max_pages), url)
         return save_to_csv(data)
     finally:
