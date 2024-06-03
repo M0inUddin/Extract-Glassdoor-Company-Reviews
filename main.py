@@ -60,7 +60,7 @@ def login_to_glassdoor(driver):
     time.sleep(120)
     # Find and click the sign-in button
     sign_in_button = driver.find_element(
-        By.CSS_SELECTOR, "button[data-role-variant='primary']"
+        By.CSS_SELECTOR, "button[class='Button Button']"
     )
     sign_in_button.click()
 
