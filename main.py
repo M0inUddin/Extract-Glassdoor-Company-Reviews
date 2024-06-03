@@ -10,7 +10,7 @@ import time
 
 def setup_driver():
     options = Options()
-    options.add_argument("--user-data-dir=~/.config/google-chrome/Default")
+    #options.add_argument("--user-data-dir=~/.config/google-chrome/Default")
     options.add_argument("--start-maximized")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
@@ -25,7 +25,7 @@ def setup_driver():
 
 def scrape_data(driver, max_pages, url):
     driver.get(url)
-    time.sleep(10)
+    time.sleep(120)
     data = []
     page_count = 0
     while page_count < max_pages:
