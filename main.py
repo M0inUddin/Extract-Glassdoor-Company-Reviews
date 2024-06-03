@@ -103,4 +103,4 @@ interface = gr.Interface(
     flagging_dir=flagging_dir,  # Specify the flagging directory
 )
 
-interface.launch()
+interface.launch(server_name="0.0.0.0", server_port=7860)
