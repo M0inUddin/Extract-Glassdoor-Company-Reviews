@@ -6,7 +6,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 import pandas as pd
 import time
-
+import os
 
 def setup_driver():
     options = Options()
@@ -42,7 +42,7 @@ def login_to_glassdoor(driver):
 
     # Find and fill the email field
     email_field = driver.find_element(By.CSS_SELECTOR, "input#inlineUserEmail")
-    email_field.send_keys("guttuhopuddeu-8645@yopmail.com")
+    email_field.send_keys(os.environ.get("EMAIL"))
 
     # Find and click the continue button
     continue_button = driver.find_element(
@@ -56,7 +56,7 @@ def login_to_glassdoor(driver):
 
     # Find and fill the password field
     password_field = driver.find_element(By.CSS_SELECTOR, "input#inlineUserPassword")
-    password_field.send_keys("Asd123123")
+    password_field.send_keys(os.environ.get("PASSWORD"))
     time.sleep(10)
     # Find and click the sign-in button
     sign_in_button = driver.find_element(
