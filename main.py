@@ -8,6 +8,7 @@ import pandas as pd
 import time
 import os
 
+
 def setup_driver():
     options = Options()
     options.add_argument("--start-maximized")
