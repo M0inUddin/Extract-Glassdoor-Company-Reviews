@@ -9,6 +9,7 @@ import pandas as pd
 import time
 import os
 from dotenv import load_dotenv
+import random
 
 # Load environment variables
 load_dotenv()
@@ -17,7 +18,6 @@ PASSWORD = os.getenv("PASSWORD")
 
 # Setup logging
 logging.basicConfig(
-    filename="web_scraper.log",
     level=logging.INFO,
     format="%(asctime)s:%(levelname)s:%(message)s",
 )
@@ -38,17 +38,10 @@ def setup_driver():
     return driver
 
 
-def close_popups(driver):
-    try:
-        popup_close_button = driver.find_element(
-            By.CSS_SELECTOR, "button.popup-close-button"
-        )  # Update selector to match actual popup close button
-        if popup_close_button.is_displayed():
-            popup_close_button.click()
-            time.sleep(2)  # Wait for the popup to close
-            logging.info("Popup closed.")
-    except Exception as e:
-        logging.error(f"Error closing popup: {e}")
+def human_type(element, text):
+    for char in text:
+        element.send_keys(char)
+        time.sleep(random.uniform(0.05, 0.2))  # Random delay between keystrokes
 
 
 def login_to_glassdoor(driver):
@@ -56,11 +49,9 @@ def login_to_glassdoor(driver):
     driver.get("https://www.glassdoor.com")
     time.sleep(5)  # Wait for the page to load
 
-    close_popups(driver)  # Close any popups if present
-
     # Find and fill the email field
     email_field = driver.find_element(By.CSS_SELECTOR, "input#inlineUserEmail")
-    email_field.send_keys(EMAIL)
+    human_type(email_field, EMAIL)
 
     # Find and click the continue button
     continue_button = driver.find_element(
@@ -70,11 +61,9 @@ def login_to_glassdoor(driver):
 
     time.sleep(10)  # Wait for the password field to appear
 
-    close_popups(driver)  # Close any popups if present
-
     # Find and fill the password field
     password_field = driver.find_element(By.CSS_SELECTOR, "input#inlineUserPassword")
-    password_field.send_keys(PASSWORD)
+    human_type(password_field, PASSWORD)
     time.sleep(10)
     # Find and click the sign-in button
     sign_in_button = driver.find_element(
@@ -83,7 +72,6 @@ def login_to_glassdoor(driver):
     sign_in_button.click()
 
     time.sleep(10)  # Wait for the login process to complete
-    close_popups(driver)  # Close any popups if present
     logging.info("Logged in to Glassdoor successfully.")
 
 
@@ -107,7 +95,6 @@ def scrape_data(driver, max_pages, url):
     time.sleep(10)  # Wait for the page to load
 
     dismiss_overlays(driver)  # Dismiss any overlays if present
-    close_popups(driver)  # Close any popups if present
 
     data = []
     page_count = 0
