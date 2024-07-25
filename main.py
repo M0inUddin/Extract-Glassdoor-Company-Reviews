@@ -1,4 +1,5 @@
 import gradio as gr
+import logging
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
@@ -9,13 +10,21 @@ import time
 import os
 from dotenv import load_dotenv
 
+# Load environment variables
 load_dotenv()
-
 EMAIL = os.getenv("EMAIL")
 PASSWORD = os.getenv("PASSWORD")
 
+# Setup logging
+logging.basicConfig(
+    filename="web_scraper.log",
+    level=logging.INFO,
+    format="%(asctime)s:%(levelname)s:%(message)s",
+)
+
 
 def setup_driver():
+    logging.info("Setting up the WebDriver.")
     options = Options()
     options.add_argument("--start-maximized")
     options.add_argument("--no-sandbox")
@@ -37,11 +46,13 @@ def close_popups(driver):
         if popup_close_button.is_displayed():
             popup_close_button.click()
             time.sleep(2)  # Wait for the popup to close
+            logging.info("Popup closed.")
     except Exception as e:
-        pass
+        logging.error(f"Error closing popup: {e}")
 
 
 def login_to_glassdoor(driver):
+    logging.info("Navigating to Glassdoor and attempting to log in.")
     driver.get("https://www.glassdoor.com")
     time.sleep(5)  # Wait for the page to load
 
@@ -73,6 +84,7 @@ def login_to_glassdoor(driver):
 
     time.sleep(10)  # Wait for the login process to complete
     close_popups(driver)  # Close any popups if present
+    logging.info("Logged in to Glassdoor successfully.")
 
 
 def dismiss_overlays(driver):
@@ -83,12 +95,13 @@ def dismiss_overlays(driver):
         if consent_button.is_displayed():
             consent_button.click()
             time.sleep(2)  # Wait for the overlay to disappear
+            logging.info("Consent overlay dismissed.")
     except Exception as e:
-        pass
+        logging.error(f"Error dismissing overlay: {e}")
 
 
 def scrape_data(driver, max_pages, url):
-    # Now open the user-provided URL in a new tab
+    logging.info(f"Scraping data from {url} for {max_pages} pages.")
     driver.execute_script(f"window.open('{url}', '_blank');")
     driver.switch_to.window(driver.window_handles[1])
     time.sleep(10)  # Wait for the page to load
@@ -145,6 +158,8 @@ def scrape_data(driver, max_pages, url):
                 }
             )
 
+        logging.info(f"Scraped {len(reviews)} reviews from page {page_count + 1}.")
+
         try:
             next_button = driver.find_element(
                 By.CSS_SELECTOR, 'button[data-test="next-page"]'
@@ -154,14 +169,17 @@ def scrape_data(driver, max_pages, url):
             page_count += 1
             time.sleep(5)  # Wait for the next page to load
         except Exception as e:
+            logging.error(f"Error navigating to the next page: {e}")
             break
 
+    logging.info("Data scraping completed.")
     return data
 
 
 def save_to_csv(data, filename="reviews.csv"):
     df = pd.DataFrame(data)
     df.to_csv(filename, index=False)
+    logging.info(f"Data has been written to {filename}.")
     return f"Data has been written to {filename}", filename
 
 
@@ -174,6 +192,7 @@ def access_and_interact(url, max_pages):
         return save_to_csv(data)
     finally:
         driver.quit()
+        logging.info("WebDriver closed.")
 
 
 interface = gr.Interface(
