@@ -170,14 +170,13 @@ def access_and_interact(url, max_pages):
         driver.quit()
 
 
-flagging_dir = "/home/ubuntu/flagged"  # Specify the directory for flagging
 interface = gr.Interface(
     fn=access_and_interact,
     inputs=["text", "number"],
     outputs=["text", "file"],
     title="Web Scraper Interface",
     description="Please Enter the URL of reviews page from Glassdoor.",
-    flagging_dir=flagging_dir,  # Specify the flagging directory
+    allow_flagging="never",
 )
 
 interface.launch(server_name="0.0.0.0", server_port=7860)
