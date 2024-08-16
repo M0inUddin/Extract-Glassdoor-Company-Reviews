@@ -9,7 +9,7 @@ To use this project, follow these steps:
 1. Clone the repository:
 
     ```bash
-    git clone https://github.com/your-username/Extract-Glassdoor-Company-Reviews.git
+    git clone https://github.com/M0inUddin/Extract-Glassdoor-Company-Reviews.git
     ```
 
 2. Navigate to the project directory:
