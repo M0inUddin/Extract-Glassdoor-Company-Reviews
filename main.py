@@ -191,4 +191,4 @@ interface = gr.Interface(
     allow_flagging="never",
 )
 
-interface.launch(server_name="0.0.0.0", server_port=7860)
+interface.launch(server_name="0.0.0.0", server_port=7860, share=True)
